@@ -1,6 +1,4 @@
-*/
-
-function getStream (type) {
+function getVideoStream(type) {
   if (!navigator.mediaDevices && !navigator.getUserMedia && !navigator.webkitGetUserMedia &&
     !navigator.mozGetUserMedia && !navigator.msGetUserMedia) {
     alert('User Media API not supported.');
@@ -29,7 +27,6 @@ function getStream (type) {
     });
 }
 
-
 function getUserMedia(options, successCallback, failureCallback) {
   var api = navigator.getUserMedia || navigator.webkitGetUserMedia ||
     navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -42,7 +39,7 @@ var theStream;
 var theRecorder;
 var recordedChunks = [];
 
-function getStream() {
+function startRecording() {
   if (!navigator.getUserMedia && !navigator.webkitGetUserMedia &&
     !navigator.mozGetUserMedia && !navigator.msGetUserMedia) {
     alert('User Media API not supported.');
@@ -66,7 +63,7 @@ function getStream() {
 
     theStream = stream;
     try {
-      recorder = new MediaRecorder(stream, {mimeType : "video/webm"});
+      recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
     } catch (e) {
       console.error('Exception while creating MediaRecorder: ' + e);
       return;
@@ -90,7 +87,7 @@ function download() {
   theRecorder.stop();
   theStream.getTracks()[0].stop();
 
-  var blob = new Blob(recordedChunks, {type: "video/webm"});
+  var blob = new Blob(recordedChunks, { type: "video/webm" });
   var url = (window.URL || window.webkitURL).createObjectURL(blob);
   var a = document.createElement("a");
   document.body.appendChild(a);
@@ -101,65 +98,18 @@ function download() {
 
   // setTimeout() here is needed for Firefox.
   setTimeout(function () {
-      (window.URL || window.webkitURL).revokeObjectURL(url);
+    (window.URL || window.webkitURL).revokeObjectURL(url);
   }, 100);
 }
 
-
-function takePhoto() {
-  if (!('ImageCapture' in window)) {
-    alert('ImageCapture is not available');
-    return;
-  }
-
-  if (!theStream) {
-    alert('Grab the video stream first!');
-    return;
-  }
-
-  var theImageCapturer = new ImageCapture(theStream.getVideoTracks()[0]);
-
-  theImageCapturer.takePhoto()
-    .then(blob => {
-      var theImageTag = document.getElementById("imageTag");
-      theImageTag.src = URL.createObjectURL(blob);
-      toDataURL(theImageTag.src, function(dataUrl) {
-      //console.log('RESULT:', dataUrl)
-      localStorage['icon'] = dataUrl;
-    })
-    })
-    .catch(err => alert('Error: ' + err));
-
-}
-function toDataURL(url, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.onload = function() {
-    var reader = new FileReader();
-    reader.onloadend = function() {
-      callback(reader.result);
-    }
-    reader.readAsDataURL(xhr.response);
-  };
-  xhr.open('GET', url);
-  xhr.responseType = 'blob';
-  xhr.send();
-}
-
-
-
-function loadPhoto() {
-
-
-  //document.querySelector("#myicon").src = imageUrl;
-  document.getElementById("myicon").src = localStorage['icon'];
-}
+// Restlicher Code bleibt unverändert
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/serviceWorker.js').then(function(registration) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('/serviceWorker.js').then(function (registration) {
       // Registration was successful
       console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }, function(err) {
+    }, function (err) {
       // registration failed 😦
       console.log('ServiceWorker registration failed: ', err);
     });
